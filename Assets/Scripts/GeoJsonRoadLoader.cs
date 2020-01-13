@@ -10,12 +10,10 @@ using UnityEngine.Serialization;
 
 public class GeoJsonRoadLoader : MonoBehaviour
 {
-    [SerializeField] GameObject repere1;
-    [SerializeField] GameObject repere2;
-    [SerializeField] Vector3 scale;
+    [SerializeField] float scale;
     [SerializeField] Material material;
-
     [SerializeField] private string resourceFileName;
+    [SerializeField] private Vector3 refPoint;
     private string _json;
     private FeatureCollection _geoJsonFeatureCollection;
 
@@ -24,13 +22,24 @@ public class GeoJsonRoadLoader : MonoBehaviour
         _json = Resources.Load<TextAsset>(resourceFileName)?.text;
         _geoJsonFeatureCollection = JsonConvert.DeserializeObject<FeatureCollection>(_json, new GeoJsonConverter());
 
-        Utils.setReperes(repere1.transform.position, repere2.transform.position, new Vector3(4.85f, 0f, 45.68f), new Vector3(5f, 0f, 45.74f));
-
         GameObject roads = new GameObject("Routes");
-        roads.transform.eulerAngles = new Vector3(90, roads.transform.eulerAngles.y, roads.transform.eulerAngles.z);
+        //roads.transform.eulerAngles = new Vector3(90, roads.transform.eulerAngles.y, roads.transform.eulerAngles.z);
 
-        GameObject road = DrawTroncon(_geoJsonFeatureCollection.Features[0]);
-        road.transform.parent = roads.transform;
+        GameObject road1 = DrawTroncon(_geoJsonFeatureCollection.Features[0]);
+        road1.transform.parent = roads.transform;
+        //GameObject road2 = DrawTroncon(_geoJsonFeatureCollection.Features[1]);
+        //road2.transform.parent = roads.transform;
+        //GameObject road3 = DrawTroncon(_geoJsonFeatureCollection.Features[2]);
+        //road3.transform.parent = roads.transform;
+        GameObject road4 = DrawTroncon(_geoJsonFeatureCollection.Features[3]);
+        road4.transform.parent = roads.transform;
+
+        //foreach (Feature troncon in _geoJsonFeatureCollection.Features)
+        //{
+        //    GameObject road = DrawTroncon(troncon);
+        //    road.transform.parent = roads.transform;
+        //}
+
     }
 
     GameObject DrawTroncon(Feature feature)
@@ -41,17 +50,20 @@ public class GeoJsonRoadLoader : MonoBehaviour
         
         GameObject road = new GameObject(nom_itineraire);
         RoadCreator roadCreator = road.AddComponent<RoadCreator>();
-        roadCreator.spacing = 0.5f;
+        roadCreator.spacing = 1f;
+        roadCreator.roadWidth = (float)largeur_itineraire;
         roadCreator.material = material;
-        roadCreator.tiling = 5;
+        roadCreator.tiling = 2;
         Path path = road.GetComponent<Path>();
+        path.AutoSetControlPoints = true;
         path.points = new List<Vector3>();
 
         foreach (LineString troncon in itineraire.Coordinates)
         {
             foreach (IPosition position in troncon.Coordinates)
             {
-                path.points.Add(Utils.LatLongToVector(position.Latitude, position.Longitude, position.Altitude.Value));        
+                path.AddSegment(GeoUtils.GeoToWorldPosition(position.Latitude, position.Longitude, position.Altitude.Value, refPoint, scale));
+                //path.points.Add(GeoUtils.GeoToWorldPosition(position.Latitude, position.Longitude, position.Altitude.Value, refPoint, scale));
             }
         }
 
