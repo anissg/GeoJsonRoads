@@ -101,6 +101,20 @@ public class Path: MonoBehaviour
 
     public void AddSegment(Vector3 anchorPos)
     {
+        if (points.Count == 0)
+        {
+            points.Add(anchorPos);
+            return;
+        }
+
+        if (points.Count == 1)
+        {
+            points.Add((points[points.Count - 1] + anchorPos) * .5f);
+            points.Add(points[points.Count - 1] * 2 - points[points.Count - 2]);
+            points.Add(anchorPos);
+            return;
+        }
+
         points.Add(points[points.Count - 1] * 2 - points[points.Count - 2]);
         points.Add((points[points.Count - 1] + anchorPos) * .5f);
         points.Add(anchorPos);

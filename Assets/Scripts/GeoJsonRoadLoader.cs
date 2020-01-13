@@ -23,22 +23,12 @@ public class GeoJsonRoadLoader : MonoBehaviour
         _geoJsonFeatureCollection = JsonConvert.DeserializeObject<FeatureCollection>(_json, new GeoJsonConverter());
 
         GameObject roads = new GameObject("Routes");
-        //roads.transform.eulerAngles = new Vector3(90, roads.transform.eulerAngles.y, roads.transform.eulerAngles.z);
 
-        GameObject road1 = DrawTroncon(_geoJsonFeatureCollection.Features[0]);
-        road1.transform.parent = roads.transform;
-        //GameObject road2 = DrawTroncon(_geoJsonFeatureCollection.Features[1]);
-        //road2.transform.parent = roads.transform;
-        //GameObject road3 = DrawTroncon(_geoJsonFeatureCollection.Features[2]);
-        //road3.transform.parent = roads.transform;
-        GameObject road4 = DrawTroncon(_geoJsonFeatureCollection.Features[3]);
-        road4.transform.parent = roads.transform;
-
-        //foreach (Feature troncon in _geoJsonFeatureCollection.Features)
-        //{
-        //    GameObject road = DrawTroncon(troncon);
-        //    road.transform.parent = roads.transform;
-        //}
+        foreach (Feature troncon in _geoJsonFeatureCollection.Features)
+        {
+            GameObject road = DrawTroncon(troncon);
+            road.transform.parent = roads.transform;
+        }
 
     }
 
@@ -63,7 +53,6 @@ public class GeoJsonRoadLoader : MonoBehaviour
             foreach (IPosition position in troncon.Coordinates)
             {
                 path.AddSegment(GeoUtils.GeoToWorldPosition(position.Latitude, position.Longitude, position.Altitude.Value, refPoint, scale));
-                //path.points.Add(GeoUtils.GeoToWorldPosition(position.Latitude, position.Longitude, position.Altitude.Value, refPoint, scale));
             }
         }
 

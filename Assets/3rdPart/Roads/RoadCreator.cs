@@ -16,13 +16,18 @@ public class RoadCreator : MonoBehaviour
 
     public void Start()
     {
+        GenerateRoad();
+    }
+
+    public void GenerateRoad()
+    {
         Path path = GetComponent<Path>();
         Vector3[] points = path.CalculateEvenlySpacedPoints(spacing);
         GetComponent<MeshFilter>().mesh = CreateRoadMesh(points, path.IsClosed);
 
         int textureRepeat = Mathf.RoundToInt(tiling * points.Length * spacing * .05f);
-        GetComponent<MeshRenderer>().sharedMaterial = material;
-        GetComponent<MeshRenderer>().sharedMaterial.mainTextureScale = new Vector3(1, textureRepeat);
+        GetComponent<MeshRenderer>().material = material;
+        GetComponent<MeshRenderer>().material.mainTextureScale = new Vector3(1, textureRepeat);
     }
 
     Mesh CreateRoadMesh(Vector3[] points, bool isClosed)
@@ -47,7 +52,7 @@ public class RoadCreator : MonoBehaviour
             }
 
             forward.Normalize();
-            Vector3 left = new Vector3(-forward.y, forward.x);
+            Vector3 left = new Vector3(-forward.z, forward.y, forward.x);
 
             verts[vertIndex] = points[i] + left * roadWidth * .5f;
             verts[vertIndex + 1] = points[i] - left * roadWidth * .5f;
