@@ -2,18 +2,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[System.Serializable]
-public class Path
+public class Path: MonoBehaviour
 {
-    [SerializeField, HideInInspector]
     public List<Vector3> points;
-    [SerializeField, HideInInspector]
+    [SerializeField]
     bool isClosed;
-    [SerializeField, HideInInspector]
+    [SerializeField]
     bool autoSetControlPoints;
 
-    public Path(Vector3 centre)
+    public void Awake()
     {
+        Vector3 centre = transform.position;
         points = new List<Vector3>
         {
             centre + Vector3.left,

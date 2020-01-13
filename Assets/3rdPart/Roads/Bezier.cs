@@ -4,6 +4,11 @@ using UnityEngine;
 
 public static class Bezier
 {
+    public static Vector3 EvaluateLerp(Vector3 a, Vector3 b, float t)
+    {
+        return Vector3.Lerp(a, b, t);
+    }
+
     public static Vector3 EvaluateQuadratic(Vector3 a, Vector3 b, Vector3 c, float t)
     {
         Vector3 p0 = Vector3.Lerp(a, b, t);
