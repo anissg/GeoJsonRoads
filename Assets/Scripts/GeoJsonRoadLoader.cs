@@ -16,6 +16,7 @@ public class GeoJsonRoadLoader : MonoBehaviour
     [SerializeField] private Vector3 refPoint;
     private string _json;
     private FeatureCollection _geoJsonFeatureCollection;
+    private double altitude;
 
     void Start()
     {
@@ -35,24 +36,29 @@ public class GeoJsonRoadLoader : MonoBehaviour
     GameObject DrawTroncon(Feature feature)
     {
         MultiLineString itineraire = feature.Geometry as MultiLineString;
-        string nom_itineraire = feature.Properties["NOM_ITI"].ToString();
+        string id_itineraire = feature.Properties["ID"].ToString();
         double largeur_itineraire = (double) feature.Properties["LARGEUR"];
         
-        GameObject road = new GameObject(nom_itineraire);
+        GameObject road = new GameObject(id_itineraire);
         RoadCreator roadCreator = road.AddComponent<RoadCreator>();
         roadCreator.spacing = 1f;
         roadCreator.roadWidth = (float)largeur_itineraire;
         roadCreator.material = material;
         roadCreator.tiling = 2;
         Path path = road.GetComponent<Path>();
-        path.AutoSetControlPoints = true;
+        //path.AutoSetControlPoints = true;
         path.points = new List<Vector3>();
 
         foreach (LineString troncon in itineraire.Coordinates)
         {
             foreach (IPosition position in troncon.Coordinates)
             {
-                path.AddSegment(GeoUtils.GeoToWorldPosition(position.Latitude, position.Longitude, position.Altitude.Value, refPoint, scale));
+                if (position.Altitude.HasValue)
+                    if (position.Altitude.Value < 250)
+                        altitude = position.Altitude.Value;
+
+                path.AddSegment(GeoUtils.GeoToWorldPosition(position.Latitude, position.Longitude,
+                    altitude, refPoint, scale));
             }
         }
 
